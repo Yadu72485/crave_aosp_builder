@@ -101,8 +101,8 @@ jobs:
           rm -rf ${PWD}/crave.conf.sample          
         fi
       env:
-        CRAVE_USERNAME: ${{ secrets.CRAVE_USERNAME }}
-        CRAVE_TOKEN: ${{ secrets.CRAVE_TOKEN }}
+        CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
+        CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}
 
     - name: Run crave devspace
       run: |
@@ -217,7 +217,7 @@ jobs:
           export local_manifest_url="${local_manifest_url%/}"
           LOCAL_MANIFEST="mkdir -p .repo/local_manifests && rm -rf .repo/local_manifests/* || true && curl -sSL -o .repo/local_manifests/local_manifest.xml ${local_manifest_url}"
         else
-          export LOCAL_MANIFEST="git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }} .repo/local_manifests"
+          export LOCAL_MANIFEST="git clone ${{ github.event.inputs.LOCAL_MANIFEST }} --depth 1 -b ${{github.event.inputs.LOCAL_MANIFEST_BRANCH}} .repo/local_manifests"
         fi
 
         echo "Building on ${{ github.event.inputs.BASE_PROJECT }} project"
@@ -398,13 +398,11 @@ jobs:
           echo "We are already running in devspace... Skipping Symlinks"
         fi
 
-        # Clean build requested check
         if [ "${{ github.event.inputs.CLEAN_BUILD }}" == "yes" ]; then
           echo "Clean build requested, removing existing clone..."
           crave clone destroy -y $PROJECTFOLDER || true
         fi
 
-        # Check whether clone already exists
         if grep -q "$PROJECTFOLDER" <(crave clone list --json | jq -r '.clones[]."Cloned At"'); then
           echo "Clone already exists, keeping it for fast caching!"
         else
@@ -436,7 +434,6 @@ jobs:
         mkdir -p $PROJECTFOLDER/.repo/manifests
         if [[ $DCDEVSPACE == *1* ]]; then
           echo 'Already in devspace'
-          # Ensure crave.conf exists inside project folder
           if [ -f ~/.crave/crave.conf ]; then
             cp ~/.crave/crave.conf $PROJECTFOLDER/
           fi
@@ -457,8 +454,8 @@ jobs:
           echo "Custom Configuration Found!"
         fi
       env:
-        CRAVE_USERNAME: ${{ secrets.CRAVE_USERNAME }}
-        CRAVE_TOKEN: ${{ secrets.CRAVE_TOKEN }}
+        CRAVE_USERNAME: ${{  secrets.CRAVE_USERNAME  }}
+        CRAVE_TOKEN: ${{  secrets.CRAVE_TOKEN  }}
 
     - name: Set the 'crave' project
       run: |
@@ -485,7 +482,6 @@ jobs:
       run: |
         cd $PROJECTFOLDER
         
-        # Ensure crave.conf has correct project settings (do not wipe projects array!)
         if [ ! -f crave.conf ] && [ -f ~/.crave/crave.conf ]; then
           cp ~/.crave/crave.conf ./crave.conf
         fi
@@ -522,7 +518,7 @@ jobs:
       timeout-minutes: 1440
 
     - name: Telegram Notification
-      if: ${{ success() }}
+      if:  ${{ success() }}
       continue-on-error: true
       run: |
         send_telegram_message() {
@@ -543,7 +539,7 @@ jobs:
         skipSuccess: false
 
     - name: Telegram Notification
-      if: ${{ cancelled() || failure() }}
+      if:  ${{ cancelled() || failure() }}
       continue-on-error: true
       run: |
         send_telegram_message() {
@@ -596,5 +592,3 @@ jobs:
         cd $PROJECTFOLDER
         crave ssh -- "export TG_UPLOAD_LIMIT="${{ secrets.TG_UPLOAD_LIMIT }}"; bash /opt/crave/telegram/upload.sh '${{ github.event.inputs.DEVICE_NAME }}' '${{ secrets.EXTRA_FILES }}'"
       continue-on-error: true
-
-    # Destroy Clone completely removed to preserve source code and cache between builds!
