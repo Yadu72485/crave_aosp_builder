@@ -509,6 +509,7 @@ jobs:
 
         export BUILD_USERNAME=${{ github.actor }} ; \
         export BUILD_HOSTNAME=crave ; \
+        rm -rf hardware/xiaomi/aidl/sensors ; \
         source build/envsetup.sh && \
 
         echo "Repository: ${{ github.repository }}"; \
