@@ -510,7 +510,7 @@ jobs:
         export BUILD_USERNAME=${{ github.actor }} ; \
         export BUILD_HOSTNAME=crave ; \
         (cd device/xiaomi/sky && git fetch origin && git reset --hard origin/15.0) || true ; \
-        rm -rf hardware/xiaomi/aidl/sensors device/xiaomi/sky/gps hardware/qcom-caf/sm8450/audio/agm out/soong/Android-lineage_sky.mk ; \
+        rm -rf hardware/xiaomi/aidl/sensors device/xiaomi/sky/gps hardware/qcom-caf/sm8450/audio/agm/service hardware/qcom-caf/sm8450/audio/agm/ipc/HwBinders/agm_ipc_service out/soong/Android-lineage_sky.mk ; \
         source build/envsetup.sh && \
 
         echo "Repository: ${{ github.repository }}"; \
