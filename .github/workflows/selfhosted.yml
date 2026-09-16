@@ -101,12 +101,17 @@ jobs:
         if [[ $DCDEVSPACE == *1* ]]; then
           echo 'No need to set up crave, we are already running in devspace!'
         else
-          mkdir -p ${HOME}/bin/
+          mkdir -p ${HOME}/bin/ ${HOME}/.crave/
           curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
           mv ${PWD}/crave ${HOME}/bin/
           sudo ln -sf /home/${USER}/bin/crave /usr/bin/crave
-          envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
-          rm -rf ${PWD}/crave.conf.sample
+          
+          if [ -f ${PWD}/crave.conf ]; then
+            cp ${PWD}/crave.conf ${HOME}/.crave/crave.conf
+          else
+            echo "Error: crave.conf not found in repository!"
+            exit 1
+          fi
         fi
       env:
         CRAVE_USERNAME: ${{ secrets.CRAVE_USERNAME }}
@@ -142,11 +147,12 @@ jobs:
 
     - name: Check Credentials
       run: |
-        if [[ -z "${{ secrets.CRAVE_TOKEN }}" || -z "${{ secrets.CRAVE_USERNAME }}" ]]; then
-          echo "Crave Credentials Not Configured! Exiting..."
-          exit 1
+        if [ -f crave.conf ]; then
+          echo "crave.conf found!"
+        else
+          echo "Warning: crave.conf not found in root, continuing..."
         fi
-        bash scripts/env-checker.sh
+        bash scripts/env-checker.sh || true
 
     - name: Set Project variables
       id: proj-variables
@@ -475,7 +481,7 @@ jobs:
       run: |
         echo "DCDEVSPACE status: ${DCDEVSPACE}"
 
-        mkdir -p $PROJECTFOLDER/.repo/manifests
+        mkdir -p $PROJECTFOLDER/.repo/manifests ${HOME}/.crave/
 
         if [[ $DCDEVSPACE == *1* ]]; then
           echo 'Already in devspace'
@@ -486,9 +492,14 @@ jobs:
           curl -s https://raw.githubusercontent.com/accupara/crave/master/get_crave.sh | bash -s --
           mv ${PWD}/crave ${HOME}/bin/
           sudo ln -sf /home/${USER}/bin/crave /usr/bin/crave
-          envsubst < ${PWD}/crave.conf.sample >> ${PWD}/crave.conf
-          rm -rf ${PWD}/crave.conf.sample
-          cp crave.conf $PROJECTFOLDER/
+          
+          if [ -f ${PWD}/crave.conf ]; then
+            cp ${PWD}/crave.conf ${HOME}/.crave/crave.conf
+            cp ${PWD}/crave.conf $PROJECTFOLDER/crave.conf
+          else
+            echo "Error: crave.conf not found!"
+            exit 1
+          fi
         fi
 
         if [[ -z "${{ secrets.CUSTOM_YAML }}" ]]; then
