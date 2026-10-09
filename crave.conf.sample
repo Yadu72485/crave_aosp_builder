@@ -1,8 +1,8 @@
 {
-  "username": "${CRAVE_USERNAME}",
+  "username": "ppry20192021@gmail.com",
   "headers": {
     "Content-Type": "application/json",
-    "Authorization": "${CRAVE_TOKEN}",
+    "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2NDQsInRlYW1JZCI6MTQsImlzQXBpS2V5Ijp0cnVlLCJpYXQiOjE3ODgyNDE5NzB9._MVign0a1KoAgqJKScVpAe3o4NnU0hcHaEMsMmzAnVA",
     "User-Agent": "Crave"
   },
   "projects": [],
